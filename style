@@ -1,1 +1,37 @@
+body{
+    font-family: Arial, sans-serif;
+    background:#222;
+    color:white;
+    text-align:center;
+}
 
+.container{
+    max-width:700px;
+    margin:auto;
+    padding:20px;
+}
+
+input{
+    width:90%;
+    padding:10px;
+    margin:10px;
+}
+
+button{
+    padding:10px 20px;
+    margin:5px;
+    cursor:pointer;
+}
+
+.product{
+    background:#333;
+    margin:10px;
+    padding:10px;
+    border-radius:10px;
+}
+
+.order{
+    background:#444;
+    margin:5px;
+    padding:10px;
+}
