@@ -1,20 +1,236 @@
+<!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <title>Вход</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Тестовый магазин</title>
+
+<style>
+body{
+    font-family: Arial, sans-serif;
+    background:#222;
+    color:white;
+    text-align:center;
+    margin:0;
+    padding:20px;
+}
+.card{
+    background:#333;
+    padding:15px;
+    margin:10px auto;
+    max-width:500px;
+    border-radius:10px;
+}
+input{
+    width:90%;
+    padding:10px;
+    margin:5px;
+}
+button{
+    padding:10px 20px;
+    margin:5px;
+    cursor:pointer;
+}
+.hidden{
+    display:none;
+}
+</style>
 </head>
 <body>
 
-<div class="container">
+<div id="loginPage">
     <h1>Магазин</h1>
 
-    <input type="text" id="username" placeholder="Имя пользователя">
+    <input id="username" placeholder="Ваше имя">
+
+    <br>
 
     <button onclick="loginUser()">Войти как пользователь</button>
     <button onclick="loginAdmin()">Войти как админ</button>
 </div>
 
-<script src="script.js"></script>
+<div id="shopPage" class="hidden">
+    <h1>Магазин</h1>
+
+    <div id="products"></div>
+
+    <button onclick="logout()">Выйти</button>
+</div>
+
+<div id="adminPage" class="hidden">
+    <h1>Админ-панель</h1>
+
+    <div class="card">
+        <input id="productName" placeholder="Название товара">
+        <input id="productPrice" placeholder="Цена">
+
+        <button onclick="addProduct()">Добавить товар</button>
+    </div>
+
+    <h2>Товары</h2>
+    <div id="adminProducts"></div>
+
+    <h2>Заказы</h2>
+    <div id="orders"></div>
+
+    <button onclick="logout()">Выйти</button>
+</div>
+
+<script>
+
+if(!localStorage.products){
+    localStorage.products="[]";
+}
+
+if(!localStorage.orders){
+    localStorage.orders="[]";
+}
+
+function hideAll(){
+    document.getElementById("loginPage").classList.add("hidden");
+    document.getElementById("shopPage").classList.add("hidden");
+    document.getElementById("adminPage").classList.add("hidden");
+}
+
+function loginUser(){
+
+    let name=document.getElementById("username").value;
+
+    if(!name){
+        alert("Введите имя");
+        return;
+    }
+
+    localStorage.user=name;
+
+    hideAll();
+
+    document.getElementById("shopPage").classList.remove("hidden");
+
+    loadProducts();
+}
+
+function loginAdmin(){
+
+    let pass=prompt("Пароль");
+
+    if(pass==="admin123"){
+
+        hideAll();
+
+        document.getElementById("adminPage").classList.remove("hidden");
+
+        loadAdminProducts();
+        loadOrders();
+
+    }else{
+        alert("Неверный пароль");
+    }
+}
+
+function logout(){
+
+    hideAll();
+
+    document.getElementById("loginPage").classList.remove("hidden");
+}
+
+function addProduct(){
+
+    let name=document.getElementById("productName").value;
+    let price=document.getElementById("productPrice").value;
+
+    if(!name || !price) return;
+
+    let products=JSON.parse(localStorage.products);
+
+    products.push({
+        name:name,
+        price:price
+    });
+
+    localStorage.products=JSON.stringify(products);
+
+    loadAdminProducts();
+}
+
+function loadAdminProducts(){
+
+    let products=JSON.parse(localStorage.products);
+
+    let html="";
+
+    products.forEach(p=>{
+        html+=`
+        <div class="card">
+            <b>${p.name}</b><br>
+            ${p.price} ₽
+        </div>`;
+    });
+
+    document.getElementById("adminProducts").innerHTML=html;
+}
+
+function loadProducts(){
+
+    let products=JSON.parse(localStorage.products);
+
+    let html="";
+
+    products.forEach((p,i)=>{
+
+        html+=`
+        <div class="card">
+            <h3>${p.name}</h3>
+            <p>${p.price} ₽</p>
+
+            <button onclick="orderProduct(${i})">
+                Заказать
+            </button>
+        </div>`;
+    });
+
+    document.getElementById("products").innerHTML=html;
+}
+
+function orderProduct(i){
+
+    let products=JSON.parse(localStorage.products);
+    let orders=JSON.parse(localStorage.orders);
+
+    orders.push({
+        user:localStorage.user,
+        product:products[i].name,
+        date:new Date().toLocaleString()
+    });
+
+    localStorage.orders=JSON.stringify(orders);
+
+    alert("Заказ отправлен");
+}
+
+function loadOrders(){
+
+    let orders=JSON.parse(localStorage.orders);
+
+    let html="";
+
+    orders.reverse().forEach(o=>{
+
+        html+=`
+        <div class="card">
+            <b>${o.user}</b><br>
+            заказал<br>
+            <b>${o.product}</b><br><br>
+            ${o.date}
+        </div>`;
+    });
+
+    document.getElementById("orders").innerHTML=html;
+}
+
+</script>
+
 </body>
 </html>
+```
